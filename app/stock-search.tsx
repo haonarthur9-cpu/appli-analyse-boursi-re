@@ -4,15 +4,7 @@ import { LineChart } from 'react-native-chart-kit';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-
-interface StockData {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  data: number[];
-}
+import { StockData } from '@/types';
 
 const StockSearchScreen = () => {
   const router = useRouter();

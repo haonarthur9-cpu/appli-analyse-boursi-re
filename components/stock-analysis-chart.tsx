@@ -3,15 +3,9 @@ import { View, Text, Dimensions, ScrollView, TouchableOpacity } from 'react-nati
 import { LineChart } from 'react-native-chart-kit';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import Animated, { FadeIn } from 'react-native-reanimated';
-
-interface PredictionData {
-  current: number[];
-  predicted: number[];
-  trend: 'bullish' | 'bearish' | 'neutral';
-  confidence: number;
-  targetPrice: number;
-  timeframe: string;
-}
+import { PredictionData } from '@/types';
+import StockOpportunity from './stock-opportunity';
+import EuropeanStocks from './european-stocks';
 
 const StockAnalysisChart = () => {
   const screenWidth = Dimensions.get('window').width - 30;
@@ -63,14 +57,11 @@ const StockAnalysisChart = () => {
 
   if (!analysis) return null;
 
-  // Combine current and predicted data for visualization
   const allData = [...analysis.current, ...analysis.predicted];
-  const currentIndex = analysis.current.length - 1;
 
-  // Créer des labels mensuels cohérents
   const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
   const futureMonths = ['J+1', 'J+2', 'J+3', 'J+4', 'J+5', 'J+6', 'J+7', 'J+8', 'J+9', 'J+10', 'J+11', 'J+12'];
-  
+
   const chartData = {
     labels: [...months, ...futureMonths].slice(0, allData.length),
     datasets: [
@@ -127,20 +118,20 @@ const StockAnalysisChart = () => {
   };
 
   return (
-    <Animated.View 
+    <Animated.View
       entering={FadeIn.duration(800)}
-      style={{ 
-        backgroundColor, 
-        borderRadius: 16, 
+      style={{
+        backgroundColor,
+        borderRadius: 16,
         marginVertical: 20,
         alignSelf: 'center',
         width: '100%',
       }}
     >
-      <Text style={{ 
-        color: textColor, 
-        fontSize: 20, 
-        fontWeight: 'bold', 
+      <Text style={{
+        color: textColor,
+        fontSize: 20,
+        fontWeight: 'bold',
         marginBottom: 15,
         textAlign: 'center'
       }}>
@@ -162,8 +153,8 @@ const StockAnalysisChart = () => {
               }}
               onPress={() => setSelectedStock(symbol)}
             >
-              <Text style={{ 
-                color: selectedStock === symbol ? '#000000' : 'white', 
+              <Text style={{
+                color: selectedStock === symbol ? '#000000' : 'white',
                 fontSize: 14,
                 fontWeight: selectedStock === symbol ? 'bold' : 'normal'
               }}>
@@ -184,31 +175,31 @@ const StockAnalysisChart = () => {
         alignItems: 'center'
       }}>
         <View>
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 16, 
-            fontWeight: 'bold' 
+          <Text style={{
+            color: textColor,
+            fontSize: 16,
+            fontWeight: 'bold'
           }}>
             {selectedStock}
           </Text>
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 12, 
-            opacity: 0.7 
+          <Text style={{
+            color: textColor,
+            fontSize: 12,
+            opacity: 0.7
           }}>
             Actuel: ${analysis.current[analysis.current.length - 1]}
           </Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ 
-            color: getTrendColor(analysis.trend), 
-            fontSize: 14, 
-            fontWeight: 'bold' 
+          <Text style={{
+            color: getTrendColor(analysis.trend),
+            fontSize: 14,
+            fontWeight: 'bold'
           }}>
             {getTrendIcon(analysis.trend)} {getTrendText(analysis.trend)}
           </Text>
-          <Text style={{ 
-            color: 'white', 
+          <Text style={{
+            color: 'white',
             fontSize: 12,
             opacity: 0.8
           }}>
@@ -242,49 +233,49 @@ const StockAnalysisChart = () => {
         borderRadius: 12
       }}>
         <View style={{ alignItems: 'center' }}>
-          <Text style={{ 
-            color: getTrendColor(analysis.trend), 
-            fontSize: 16, 
-            fontWeight: 'bold' 
+          <Text style={{
+            color: getTrendColor(analysis.trend),
+            fontSize: 16,
+            fontWeight: 'bold'
           }}>
             {analysis.confidence}%
           </Text>
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 12, 
-            opacity: 0.7 
+          <Text style={{
+            color: textColor,
+            fontSize: 12,
+            opacity: 0.7
           }}>
             Confiance
           </Text>
         </View>
         <View style={{ alignItems: 'center' }}>
-          <Text style={{ 
-            color: 'white', 
-            fontSize: 16, 
-            fontWeight: 'bold' 
+          <Text style={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: 'bold'
           }}>
             {analysis.timeframe}
           </Text>
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 12, 
-            opacity: 0.7 
+          <Text style={{
+            color: textColor,
+            fontSize: 12,
+            opacity: 0.7
           }}>
             Horizon
           </Text>
         </View>
         <View style={{ alignItems: 'center' }}>
-          <Text style={{ 
+          <Text style={{
             color: analysis.targetPrice > analysis.current[analysis.current.length - 1] ? '#34C759' : '#FF3B30',
-            fontSize: 16, 
-            fontWeight: 'bold' 
+            fontSize: 16,
+            fontWeight: 'bold'
           }}>
             {analysis.targetPrice > analysis.current[analysis.current.length - 1] ? '+' : ''}{((analysis.targetPrice - analysis.current[analysis.current.length - 1]) / analysis.current[analysis.current.length - 1] * 100).toFixed(1)}%
           </Text>
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 12, 
-            opacity: 0.7 
+          <Text style={{
+            color: textColor,
+            fontSize: 12,
+            opacity: 0.7
           }}>
             Potentiel
           </Text>
@@ -299,13 +290,13 @@ const StockAnalysisChart = () => {
         borderLeftWidth: 3,
         borderLeftColor: getTrendColor(analysis.trend)
       }}>
-        <Text style={{ 
-          color: textColor, 
-          fontSize: 12, 
+        <Text style={{
+          color: textColor,
+          fontSize: 12,
           opacity: 0.8,
           lineHeight: 16
         }}>
-          📊 Analyse basée sur les indicateurs techniques, le volume de trading et les tendances historiques. 
+          📊 Analyse basée sur les indicateurs techniques, le volume de trading et les tendances historiques.
           Les prédictions sont estimées avec {analysis.confidence}% de confiance sur {analysis.timeframe}.
         </Text>
       </View>
@@ -323,10 +314,10 @@ const StockAnalysisChart = () => {
             backgroundColor: '#007AFF',
             marginBottom: 4
           }} />
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 10, 
-            opacity: 0.7 
+          <Text style={{
+            color: textColor,
+            fontSize: 10,
+            opacity: 0.7
           }}>
             Historique
           </Text>
@@ -339,10 +330,10 @@ const StockAnalysisChart = () => {
             backgroundColor: '#FF9500',
             marginBottom: 4
           }} />
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 10, 
-            opacity: 0.7 
+          <Text style={{
+            color: textColor,
+            fontSize: 10,
+            opacity: 0.7
           }}>
             Actuel
           </Text>
@@ -355,451 +346,16 @@ const StockAnalysisChart = () => {
             backgroundColor: getTrendColor(analysis.trend),
             marginBottom: 4
           }} />
-          <Text style={{ 
-            color: textColor, 
-            fontSize: 10, 
-            opacity: 0.7 
+          <Text style={{
+            color: textColor,
+            fontSize: 10,
+            opacity: 0.7
           }}>
             Prédiction
           </Text>
         </View>
       </View>
     </Animated.View>
-  );
-};
-
-
-const StockOpportunity = () => {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tint = useThemeColor({}, 'tint');
-
-  const opportunities = [
-    {
-      symbol: 'NVDA',
-      name: 'NVIDIA Corporation',
-      currentPrice: 456.70,
-      targetPrice: 520.00,
-      potential: '+13.9%',
-      confidence: 85,
-      reason: 'Demande croissante en IA et data centers',
-      timeframe: '6 mois',
-      risk: 'Modéré'
-    },
-    {
-      symbol: 'AMD',
-      name: 'Advanced Micro Devices',
-      currentPrice: 178.50,
-      targetPrice: 225.00,
-      potential: '+26.1%',
-      confidence: 72,
-      reason: 'Gagne des parts de marché sur Intel',
-      timeframe: '9 mois',
-      risk: 'Élevé'
-    },
-    {
-      symbol: 'CRM',
-      name: 'Salesforce Inc.',
-      currentPrice: 245.30,
-      targetPrice: 285.00,
-      potential: '+16.2%',
-      confidence: 68,
-      reason: 'Croissance du cloud et CRM intégré',
-      timeframe: '12 mois',
-      risk: 'Modéré'
-    }
-  ];
-
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'Faible': return '#34C759';
-      case 'Modéré': return '#FF9500';
-      case 'Élevé': return '#FF3B30';
-      default: return '#8E8E93';
-    }
-  };
-
-  return (
-    <View style={{ 
-      backgroundColor, 
-      padding: 12, 
-      borderRadius: 16, 
-      marginVertical: 12 
-    }}>
-      <Text style={{ 
-        color: textColor, 
-        fontSize: 20, 
-        fontWeight: 'bold', 
-        marginBottom: 12 
-      }}>
-        🎯 Opportunités d'Investissement
-      </Text>
-      
-      <Text style={{ 
-        color: textColor, 
-        fontSize: 14, 
-        opacity: 0.7, 
-        marginBottom: 15 
-      }}>
-        Actions avec fort potentiel de croissance
-      </Text>
-      
-      <Text style={{ 
-        color: textColor, 
-        fontSize: 14, 
-        opacity: 0.7, 
-        marginBottom: 20
-    
-      }}>
-        Actions avec fort potentiel de croissance
-      </Text>
-
-      {opportunities.map((opp, index) => (
-        <View 
-          key={opp.symbol}
-          style={{
-            backgroundColor: '#3C3C3E',
-            padding: 12,
-            borderRadius: 12,
-            marginBottom: 10,
-            borderLeftWidth: 4,
-            borderLeftColor: '#34C759'
-          }}>
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'space-between', 
-            alignItems: 'flex-start',
-            marginBottom: 10
-          }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ 
-                color: tint, 
-                fontSize: 18, 
-                fontWeight: 'bold' 
-              }}>
-                {opp.symbol}
-              </Text>
-              <Text style={{ 
-                color: textColor, 
-                fontSize: 14, 
-                opacity: 0.8 
-              }}>
-                {opp.name}
-              </Text>
-            </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ 
-                color: 'white', 
-                fontSize: 16, 
-                fontWeight: 'bold' 
-              }}>
-                ${opp.currentPrice}
-              </Text>
-              <Text style={{ 
-                color: '#34C759', 
-                fontSize: 14, 
-                fontWeight: '600' 
-              }}>
-                {opp.potential}
-              </Text>
-            </View>
-          </View>
-
-          <View style={{ 
-            backgroundColor: 'rgba(52, 199, 89, 0.1)',
-            padding: 8,
-            borderRadius: 8,
-            marginBottom: 10
-          }}>
-            <Text style={{ 
-              color: textColor, 
-              fontSize: 13, 
-              opacity: 0.9,
-              lineHeight: 18
-            }}>
-              💡 {opp.reason}
-            </Text>
-          </View>
-
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <View style={{ flexDirection: 'row', gap: 15 }}>
-              <View>
-                <Text style={{ 
-                  color: textColor, 
-                  fontSize: 11, 
-                  opacity: 0.6 
-                }}>
-                  Objectif
-                </Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 14, 
-                  fontWeight: '600' 
-                }}>
-                  ${opp.targetPrice}
-                </Text>
-              </View>
-              <View>
-                <Text style={{ 
-                  color: textColor, 
-                  fontSize: 11, 
-                  opacity: 0.6 
-                }}>
-                  Confiance
-                </Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 14, 
-                  fontWeight: '600' 
-                }}>
-                  {opp.confidence}%
-                </Text>
-              </View>
-              <View>
-                <Text style={{ 
-                  color: textColor, 
-                  fontSize: 11, 
-                  opacity: 0.6 
-                }}>
-                  Horizon
-                </Text>
-                <Text style={{ 
-                  color: 'white', 
-                  fontSize: 14, 
-                  fontWeight: '600' 
-                }}>
-                  {opp.timeframe}
-                </Text>
-              </View>
-            </View>
-            <View style={{ 
-              backgroundColor: getRiskColor(opp.risk) + '20',
-              paddingHorizontal: 8,
-              paddingVertical: 4,
-              borderRadius: 6
-            }}>
-              <Text style={{ 
-                color: getRiskColor(opp.risk),
-                fontSize: 12,
-                fontWeight: '600'
-              }}>
-                {opp.risk}
-              </Text>
-            </View>
-          </View>
-        </View>
-      ))}
-
-        <View style={{
-        backgroundColor: 'rgba(0, 122, 255, 0.1)',
-        padding: 10,
-        borderRadius: 8,
-        marginTop: 8,
-        borderLeftWidth: 3,
-        borderLeftColor: '#007AFF'
-      }}>
-        <Text style={{ 
-          color: textColor, 
-          fontSize: 12, 
-          opacity: 0.8,
-          lineHeight: 16
-        }}>
-          ⚠️ Ces estimations sont basées sur l'analyse technique et les tendances du marché. 
-          Les performances passées ne garantissent pas les résultats futurs. 
-          Faites vos propres recherches avant d'investir.
-        </Text>
-      </View>
-    </View>
-  );
-};
-
-const EuropeanStocks = () => {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tint = useThemeColor({}, 'tint');
-
-  const europeanStocks = [
-    {
-      symbol: 'ASML',
-      name: 'ASML Holding NV',
-      country: '🇳🇱 Pays-Bas',
-      currentPrice: 745.20,
-      change: +5.80,
-      changePercent: '+0.78%',
-      sector: 'Semi-conducteurs',
-      reason: 'Demande mondiale en puces électroniques'
-    },
-    {
-      symbol: 'SAP',
-      name: 'SAP SE',
-      country: '🇩🇪 Allemagne',
-      currentPrice: 185.45,
-      change: -2.30,
-      changePercent: '-1.23%',
-      sector: 'Logiciel d\'entreprise',
-      reason: 'Transition vers le cloud et IA intégrée'
-    },
-    {
-      symbol: 'LVMH',
-      name: 'LVMH Moët Hennessy',
-      country: '🇫🇷 France',
-      currentPrice: 712.80,
-      change: +8.20,
-      changePercent: '+1.16%',
-      sector: 'Luxe',
-      reason: 'Reprise du tourisme et consommation premium'
-    },
-    {
-      symbol: 'NESN',
-      name: 'Nestlé S.A.',
-      country: '🇨🇭 Suisse',
-      currentPrice: 108.65,
-      change: +0.95,
-      changePercent: '+0.88%',
-      sector: 'Agroalimentaire',
-      reason: 'Marques fortes et présence mondiale'
-    }
-  ];
-
-  return (
-    <View style={{ 
-      backgroundColor, 
-      padding: 12, 
-      borderRadius: 16, 
-      marginVertical: 12 
-    }}>
-      <Text style={{ 
-        color: textColor, 
-        fontSize: 20, 
-        fontWeight: 'bold', 
-        marginBottom: 12 
-      }}>
-        🇪🇺 Bourse Européenne
-      </Text>
-      
-      <Text style={{ 
-        color: textColor, 
-        fontSize: 14, 
-        opacity: 0.7, 
-        marginBottom: 15 
-      }}>
-        Principales actions des marchés européens
-      </Text>
-
-      {europeanStocks.map((stock, index) => (
-        <View 
-          key={stock.symbol}
-          style={{
-            backgroundColor: '#3C3C3E',
-            padding: 12,
-            borderRadius: 12,
-            marginBottom: 10,
-            borderLeftWidth: 3,
-            borderLeftColor: stock.change >= 0 ? '#34C759' : '#FF3B30'
-          }}
-        >
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'space-between', 
-            alignItems: 'flex-start',
-            marginBottom: 8
-          }}>
-            <View style={{ flex: 1 }}>
-              <View style={{ 
-                flexDirection: 'row', 
-                alignItems: 'center', 
-                gap: 8,
-                marginBottom: 4
-              }}>
-                <Text style={{ 
-                  color: tint, 
-                  fontSize: 16, 
-                  fontWeight: 'bold' 
-                }}>
-                  {stock.symbol}
-                </Text>
-                <Text style={{ 
-                  color: textColor, 
-                  fontSize: 12,
-                  opacity: 0.7
-                }}>
-                  {stock.country}
-                </Text>
-              </View>
-              <Text style={{ 
-                color: textColor, 
-                fontSize: 13, 
-                opacity: 0.8 
-              }}>
-                {stock.name}
-              </Text>
-              <Text style={{ 
-                color: textColor, 
-                fontSize: 12, 
-                opacity: 0.6,
-                marginTop: 2
-              }}>
-                {stock.sector}
-              </Text>
-            </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ 
-                color: 'white', 
-                fontSize: 16, 
-                fontWeight: 'bold' 
-              }}>
-                €{stock.currentPrice}
-              </Text>
-              <Text style={{ 
-                color: stock.change >= 0 ? '#34C759' : '#FF3B30', 
-                fontSize: 14, 
-                fontWeight: '600' 
-              }}>
-                {stock.changePercent}
-              </Text>
-            </View>
-          </View>
-
-          <View style={{
-            backgroundColor: 'rgba(0, 122, 255, 0.1)',
-            padding: 8,
-            borderRadius: 6
-          }}>
-            <Text style={{ 
-              color: textColor, 
-              fontSize: 12, 
-              opacity: 0.9,
-              lineHeight: 16
-            }}>
-              💼 {stock.reason}
-            </Text>
-          </View>
-        </View>
-      ))}
-
-      <View style={{
-        backgroundColor: 'rgba(0, 122, 255, 0.1)',
-        padding: 10,
-        borderRadius: 8,
-        marginTop: 8,
-        borderLeftWidth: 3,
-        borderLeftColor: '#007AFF'
-      }}>
-        <Text style={{ 
-          color: textColor, 
-          fontSize: 12, 
-          opacity: 0.8,
-          lineHeight: 16
-        }}>
-          🏛️ Marchés européens : CAC 40, DAX, FTSE 100, SMI, AEX, IBEX 35. 
-          Horaires : 9h-17h30 (CET). Les actions sont cotées en Euros.
-        </Text>
-      </View>
-    </View>
   );
 };
 
