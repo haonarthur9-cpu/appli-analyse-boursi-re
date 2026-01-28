@@ -57,7 +57,10 @@ export default function StockDetailScreen() {
       return null;
     }
 
-    const data = historicalData.data;
+    // Trier les données par timestamp croissant (du plus ancien au plus récent)
+    const data = [...historicalData.data].sort((a, b) =>
+      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
     const prices = data.map(d => d.current_price);
 
     // Limiter le nombre de labels selon la période

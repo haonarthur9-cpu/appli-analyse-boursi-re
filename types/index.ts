@@ -4,3 +4,4 @@
 
 export * from './stock';
 export * from './finhub';
+export * from './news';
