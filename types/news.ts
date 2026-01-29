@@ -3,14 +3,12 @@
  */
 
 export interface NewsArticle {
-  id?: number;
-  source: string;
+  source: string;           // Format: "Bloomberg (AAPL)"
   title: string;
   description: string;
   url: string;
   image_url?: string;
-  published_at: string;
-  created_at?: string;
+  published_at: string;     // ISO 8601
 }
 
 export interface NewsResponse {
@@ -27,6 +25,38 @@ export interface NewsHistoryResponse {
   offset: number;
 }
 
-export type NewsSource = 'Les Échos' | 'Boursorama';
+export type StockSymbol = 'AAPL' | 'GOOGL' | 'MSFT' | 'AMZN' | 'TSLA' |
+                          'META' | 'NVDA' | 'NFLX' | 'JPM' | 'V';
 
-export const NEWS_SOURCES: NewsSource[] = ['Les Échos', 'Boursorama'];
+export const STOCK_SYMBOLS: StockSymbol[] = [
+  'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA',
+  'META', 'NVDA', 'NFLX', 'JPM', 'V'
+];
+
+// Couleurs par symbole
+export const SYMBOL_COLORS: Record<StockSymbol, string> = {
+  AAPL: '#007AFF',
+  GOOGL: '#4285F4',
+  MSFT: '#00A4EF',
+  AMZN: '#FF9900',
+  TSLA: '#CC0000',
+  META: '#0668E1',
+  NVDA: '#76B900',
+  NFLX: '#E50914',
+  JPM: '#0070CD',
+  V: '#1A1F71',
+};
+
+// Émojis par symbole
+export const SYMBOL_EMOJIS: Record<StockSymbol, string> = {
+  AAPL: '🍎',
+  GOOGL: '🔍',
+  MSFT: '💻',
+  AMZN: '📦',
+  TSLA: '⚡',
+  META: '👥',
+  NVDA: '🎮',
+  NFLX: '🎬',
+  JPM: '🏦',
+  V: '💳',
+};

@@ -10,10 +10,10 @@ import {
   Alert,
 } from 'react-native';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { useInfiniteNews } from '@/hooks/useNews';
+import { useInfiniteNews, extractSymbol } from '@/hooks/useNews';
 import { NewsCard } from '@/components/news-card';
-import { SourceFilter } from '@/components/source-filter';
-import { NewsArticle } from '@/types/news';
+import { SymbolFilter } from '@/components/symbol-filter';
+import { NewsArticle, StockSymbol } from '@/types/news';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
@@ -22,7 +22,7 @@ export default function NewsScreen() {
   const textColor = useThemeColor({}, 'text');
   const tint = useThemeColor({}, 'tint');
 
-  const [selectedSource, setSelectedSource] = useState<string | undefined>();
+  const [selectedSymbol, setSelectedSymbol] = useState<StockSymbol | undefined>();
 
   const {
     data,
@@ -33,12 +33,22 @@ export default function NewsScreen() {
     isLoading,
     isRefetching,
     error,
-  } = useInfiniteNews(selectedSource);
+  } = useInfiniteNews(selectedSymbol);
 
+  // Aplatir toutes les pages d'articles
   const articles = React.useMemo(
     () => data?.pages.flatMap((page) => page.articles) ?? [],
     [data]
   );
+
+  // Filtrage côté client comme backup (au cas où le backend ne filtre pas parfaitement)
+  const filteredArticles = React.useMemo(() => {
+    if (!selectedSymbol) return articles;
+    return articles.filter((article) => {
+      const symbol = extractSymbol(article.source);
+      return symbol === selectedSymbol;
+    });
+  }, [articles, selectedSymbol]);
 
   const handleArticlePress = async (article: NewsArticle) => {
     try {
@@ -76,8 +86,8 @@ export default function NewsScreen() {
           Aucune actualité disponible
         </Text>
         <Text style={[styles.emptySubtitle, { color: textColor, opacity: 0.6 }]}>
-          {selectedSource
-            ? `Aucun article trouvé pour ${selectedSource}`
+          {selectedSymbol
+            ? `Aucun article trouvé pour ${selectedSymbol}`
             : 'Les actualités seront bientôt disponibles'}
         </Text>
       </Animated.View>
@@ -101,7 +111,7 @@ export default function NewsScreen() {
       <View style={[styles.container, { backgroundColor }]}>
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: textColor }]}>
-            📰 Actualités
+            📰 Market News
           </Text>
         </View>
         {renderError()}
@@ -113,24 +123,25 @@ export default function NewsScreen() {
     <View style={[styles.container, { backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: textColor }]}>
-          📰 Actualités Boursières
-        </Text>
-        {articles.length > 0 && (
-          <View style={[styles.badge, { backgroundColor: tint + '20' }]}>
-            <Text style={[styles.badgeText, { color: tint }]}>
-              {data?.pages[0]?.total || articles.length}
+        <View>
+          <Text style={[styles.headerTitle, { color: textColor }]}>
+            📰 Market News
+          </Text>
+          {filteredArticles.length > 0 && (
+            <Text style={[styles.subtitle, { color: textColor, opacity: 0.6 }]}>
+              {filteredArticles.length} article{filteredArticles.length > 1 ? 's' : ''}
+              {selectedSymbol && ` pour ${selectedSymbol}`}
             </Text>
-          </View>
-        )}
+          )}
+        </View>
       </View>
 
-      {/* Source Filter */}
-      <SourceFilter selected={selectedSource} onChange={setSelectedSource} />
+      {/* Symbol Filter */}
+      <SymbolFilter selected={selectedSymbol} onChange={setSelectedSymbol} />
 
       {/* News List */}
       <FlatList
-        data={articles}
+        data={filteredArticles}
         renderItem={renderItem}
         keyExtractor={(item, index) => `${item.url}-${index}`}
         onEndReached={() => {
@@ -149,7 +160,7 @@ export default function NewsScreen() {
             colors={[tint]}
           />
         }
-        contentContainerStyle={articles.length === 0 && styles.emptyContainer}
+        contentContainerStyle={filteredArticles.length === 0 && styles.emptyContainer}
         showsVerticalScrollIndicator={false}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
@@ -174,25 +185,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 8,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
+    marginBottom: 4,
   },
-  badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  badgeText: {
+  subtitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '500',
   },
   emptyContainer: {
     flexGrow: 1,

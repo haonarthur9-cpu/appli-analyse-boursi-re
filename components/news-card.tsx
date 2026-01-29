@@ -4,12 +4,12 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { NewsArticle } from '@/types/news';
+import { NewsArticle, SYMBOL_COLORS, SYMBOL_EMOJIS, StockSymbol } from '@/types/news';
+import { extractSymbol, extractSourceName } from '@/hooks/useNews';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -18,20 +18,14 @@ interface NewsCardProps {
   onPress: () => void;
 }
 
-const getSourceColor = (source: string): string => {
-  switch (source) {
-    case 'Les Échos':
-      return '#0066CC';
-    case 'Boursorama':
-      return '#00AA55';
-    default:
-      return '#666666';
-  }
-};
-
 export const NewsCard = React.memo<NewsCardProps>(({ article, onPress }) => {
   const textColor = useThemeColor({}, 'text');
   const cardBackground = useThemeColor({ light: '#FFFFFF', dark: '#1E1E1E' }, 'background');
+
+  const symbol = extractSymbol(article.source) as StockSymbol | null;
+  const sourceName = extractSourceName(article.source);
+  const symbolColor = symbol ? SYMBOL_COLORS[symbol] : '#666666';
+  const symbolEmoji = symbol ? SYMBOL_EMOJIS[symbol] : '';
 
   const relativeTime = React.useMemo(() => {
     try {
@@ -44,7 +38,6 @@ export const NewsCard = React.memo<NewsCardProps>(({ article, onPress }) => {
     }
   }, [article.published_at]);
 
-  const sourceColor = getSourceColor(article.source);
   const hasImage = !!article.image_url;
 
   return (
@@ -53,14 +46,14 @@ export const NewsCard = React.memo<NewsCardProps>(({ article, onPress }) => {
       onPress={onPress}
       activeOpacity={0.7}
     >
-      {/* Header with source and date */}
+      {/* Header with symbol badge and time */}
       <View style={styles.header}>
-        <View style={[styles.sourceBadge, { backgroundColor: sourceColor + '20' }]}>
-          <Text style={[styles.sourceText, { color: sourceColor }]}>
-            {article.source.toUpperCase()}
+        <View style={[styles.symbolBadge, { backgroundColor: symbolColor }]}>
+          <Text style={styles.symbolText}>
+            {symbol} {symbolEmoji}
           </Text>
         </View>
-        <Text style={[styles.date, { color: textColor, opacity: 0.6 }]}>
+        <Text style={[styles.time, { color: textColor, opacity: 0.6 }]}>
           {relativeTime}
         </Text>
       </View>
@@ -75,15 +68,23 @@ export const NewsCard = React.memo<NewsCardProps>(({ article, onPress }) => {
             transition={200}
           />
         ) : (
-          <View style={[styles.image, styles.imagePlaceholder, { backgroundColor: sourceColor + '15' }]}>
-            <Ionicons name="newspaper" size={32} color={sourceColor} style={{ opacity: 0.4 }} />
+          <View style={[styles.image, styles.imagePlaceholder, { backgroundColor: symbolColor + '15' }]}>
+            <Ionicons name="newspaper" size={32} color={symbolColor} style={{ opacity: 0.5 }} />
           </View>
         )}
 
-        <View style={[styles.textContent, hasImage && styles.textContentWithImage]}>
+        <View style={styles.textContent}>
+          {/* Source name */}
+          <Text style={[styles.source, { color: textColor, opacity: 0.5 }]}>
+            {sourceName.toUpperCase()}
+          </Text>
+
+          {/* Title */}
           <Text style={[styles.title, { color: textColor }]} numberOfLines={2}>
             {article.title}
           </Text>
+
+          {/* Description */}
           {article.description && (
             <Text
               style={[styles.description, { color: textColor, opacity: 0.7 }]}
@@ -93,11 +94,11 @@ export const NewsCard = React.memo<NewsCardProps>(({ article, onPress }) => {
             </Text>
           )}
         </View>
+      </View>
 
-        {/* External link icon */}
-        <View style={styles.linkIcon}>
-          <Ionicons name="open-outline" size={16} color={textColor} style={{ opacity: 0.4 }} />
-        </View>
+      {/* External link icon */}
+      <View style={styles.linkIcon}>
+        <Ionicons name="open-outline" size={16} color={textColor} style={{ opacity: 0.4 }} />
       </View>
     </TouchableOpacity>
   );
@@ -123,17 +124,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  sourceBadge: {
+  symbolBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
   },
-  sourceText: {
+  symbolText: {
+    color: '#FFFFFF',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
-  date: {
+  time: {
     fontSize: 12,
     fontWeight: '400',
   },
@@ -153,10 +155,12 @@ const styles = StyleSheet.create({
   },
   textContent: {
     flex: 1,
-    gap: 6,
+    gap: 4,
   },
-  textContentWithImage: {
-    paddingRight: 24,
+  source: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
   title: {
     fontSize: 16,
@@ -170,7 +174,7 @@ const styles = StyleSheet.create({
   },
   linkIcon: {
     position: 'absolute',
-    right: 0,
-    bottom: 0,
+    right: 16,
+    bottom: 16,
   },
 });
