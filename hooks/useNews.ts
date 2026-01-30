@@ -1,5 +1,5 @@
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import { fetchLatestNews, fetchNewsHistory } from '@/services/newsApi';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 /**
  * Extrait le symbole boursier depuis une source
@@ -46,16 +46,11 @@ export const useNewsHistory = (limit = 50, offset = 0, source?: string) => {
 
 /**
  * Hook pour le scroll infini des actualités
- * @param symbol - Symbole boursier optionnel pour filtrer (ex: "AAPL")
  */
-export const useInfiniteNews = (symbol?: string) => {
-  // Construire le filtre de source si un symbole est sélectionné
-  // Le backend filtre par source, donc on passe "(SYMBOLE)"
-  const sourceFilter = symbol ? `(${symbol})` : undefined;
-
+export const useInfiniteNews = () => {
   return useInfiniteQuery({
-    queryKey: ['news', 'infinite', symbol],
-    queryFn: ({ pageParam = 0 }) => fetchNewsHistory(20, pageParam, sourceFilter),
+    queryKey: ['news', 'infinite'],
+    queryFn: ({ pageParam = 0 }) => fetchNewsHistory(20, pageParam),
     getNextPageParam: (lastPage) => {
       const nextOffset = lastPage.offset + lastPage.limit;
       return nextOffset < lastPage.total ? nextOffset : undefined;

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { PredictionData } from '@/types';
-import StockOpportunity from './stock-opportunity';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import EuropeanStocks from './european-stocks';
+import StockOpportunity from './stock-opportunity';
 
 const StockAnalysisChart = () => {
   const screenWidth = Dimensions.get('window').width - 30;
@@ -48,6 +48,54 @@ const StockAnalysisChart = () => {
       confidence: 70,
       targetPrice: 166,
       timeframe: '3 mois'
+    },
+    'AMZN': {
+      current: [165, 168, 170, 172, 169, 174, 176, 173, 178, 175, 180, 177],
+      predicted: [182, 185, 188, 190, 193, 196, 198, 200, 203, 206, 208, 210],
+      trend: 'bullish',
+      confidence: 75,
+      targetPrice: 210,
+      timeframe: '3 mois'
+    },
+    'META': {
+      current: [485, 490, 495, 492, 498, 502, 498, 505, 510, 508, 515, 512],
+      predicted: [518, 522, 525, 528, 532, 535, 538, 540, 545, 548, 552, 555],
+      trend: 'bullish',
+      confidence: 80,
+      targetPrice: 555,
+      timeframe: '3 mois'
+    },
+    'NVDA': {
+      current: [820, 835, 845, 840, 850, 860, 855, 870, 865, 880, 890, 885],
+      predicted: [895, 905, 915, 925, 935, 945, 955, 965, 975, 985, 995, 1005],
+      trend: 'bullish',
+      confidence: 85,
+      targetPrice: 1005,
+      timeframe: '3 mois'
+    },
+    'NFLX': {
+      current: [625, 628, 622, 618, 620, 625, 623, 628, 630, 627, 632, 629],
+      predicted: [625, 622, 618, 615, 612, 608, 605, 602, 598, 595, 592, 590],
+      trend: 'bearish',
+      confidence: 62,
+      targetPrice: 590,
+      timeframe: '3 mois'
+    },
+    'JPM': {
+      current: [195, 197, 199, 198, 200, 202, 201, 204, 206, 205, 208, 207],
+      predicted: [209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220],
+      trend: 'bullish',
+      confidence: 73,
+      targetPrice: 220,
+      timeframe: '3 mois'
+    },
+    'V': {
+      current: [278, 280, 282, 281, 284, 286, 285, 288, 290, 289, 292, 291],
+      predicted: [293, 295, 296, 298, 299, 301, 302, 304, 305, 307, 308, 310],
+      trend: 'bullish',
+      confidence: 77,
+      targetPrice: 310,
+      timeframe: '3 mois'
     }
   };
 
@@ -59,11 +107,21 @@ const StockAnalysisChart = () => {
 
   const allData = [...analysis.current, ...analysis.predicted];
 
-  const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-  const futureMonths = ['J+1', 'J+2', 'J+3', 'J+4', 'J+5', 'J+6', 'J+7', 'J+8', 'J+9', 'J+10', 'J+11', 'J+12'];
+  // Créer des labels espacés pour éviter l'encombrement
+  const createLabels = () => {
+    const labels = [];
+    for (let i = 0; i < allData.length; i++) {
+      if (i % 3 === 0) {
+        labels.push(i < 12 ? `M${i + 1}` : `P${i - 11}`);
+      } else {
+        labels.push('');
+      }
+    }
+    return labels;
+  };
 
   const chartData = {
-    labels: [...months, ...futureMonths].slice(0, allData.length),
+    labels: createLabels(),
     datasets: [
       {
         data: allData,

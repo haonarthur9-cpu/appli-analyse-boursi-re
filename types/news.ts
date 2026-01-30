@@ -25,16 +25,24 @@ export interface NewsHistoryResponse {
   offset: number;
 }
 
-export type StockSymbol = 'AAPL' | 'GOOGL' | 'MSFT' | 'AMZN' | 'TSLA' |
-                          'META' | 'NVDA' | 'NFLX' | 'JPM' | 'V';
+export type StockSymbol = 
+  // USA
+  'AAPL' | 'GOOGL' | 'MSFT' | 'AMZN' | 'TSLA' |
+  'META' | 'NVDA' | 'NFLX' | 'JPM' | 'V' |
+  // Europe
+  'LVMH' | 'ASML' | 'SAP' | 'OR' | 'SIE' | 'MC';
 
 export const STOCK_SYMBOLS: StockSymbol[] = [
+  // USA
   'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA',
-  'META', 'NVDA', 'NFLX', 'JPM', 'V'
+  'META', 'NVDA', 'NFLX', 'JPM', 'V',
+  // Europe
+  'LVMH', 'ASML', 'SAP', 'OR', 'SIE', 'MC'
 ];
 
 // Couleurs par symbole
 export const SYMBOL_COLORS: Record<StockSymbol, string> = {
+  // USA
   AAPL: '#007AFF',
   GOOGL: '#4285F4',
   MSFT: '#00A4EF',
@@ -45,10 +53,18 @@ export const SYMBOL_COLORS: Record<StockSymbol, string> = {
   NFLX: '#E50914',
   JPM: '#0070CD',
   V: '#1A1F71',
+  // Europe
+  LVMH: '#C4A572',  // Or/Luxe
+  ASML: '#0066CC',  // Bleu tech
+  SAP: '#0FAAFF',   // Bleu SAP
+  OR: '#FFD700',    // Or L'Oréal
+  SIE: '#009999',   // Vert Siemens
+  MC: '#C4A572',    // Or/Luxe (même que LVMH)
 };
 
 // Émojis par symbole
 export const SYMBOL_EMOJIS: Record<StockSymbol, string> = {
+  // USA
   AAPL: '🍎',
   GOOGL: '🔍',
   MSFT: '💻',
@@ -59,4 +75,11 @@ export const SYMBOL_EMOJIS: Record<StockSymbol, string> = {
   NFLX: '🎬',
   JPM: '🏦',
   V: '💳',
+  // Europe
+  LVMH: '👜',      // LVMH - Luxe
+  ASML: '💎',      // ASML - Semi-conducteurs
+  SAP: '📊',       // SAP - Logiciels
+  OR: '💄',        // L'Oréal - Cosmétiques
+  SIE: '⚙️',       // Siemens - Industrie
+  MC: '🏬',        // Autres luxe
 };

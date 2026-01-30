@@ -1,15 +1,14 @@
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, Layout, SlideInRight, useSharedValue } from 'react-native-reanimated';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { ThemedView } from '@/components/themed-view';
-import { useRouter } from 'expo-router';
 import StockComparison from '@/components/apple-stock-chart';
+import ParallaxScrollView from '@/components/parallax-scroll-view';
 import StockAnalysisChart from '@/components/stock-analysis-chart';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -19,16 +18,17 @@ export default function HomeScreen() {
   
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: '#000000', dark: '#000000' }}
       headerImage={
         <Animated.Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require('@/assets/images/bull-market.png')}
           style={[
-            styles.reactLogo,
+            styles.headerImage,
             {
               transform: [{ scale }],
             }
           ]}
+          resizeMode="cover"
           entering={FadeIn.duration(1000)}
         />
       }>
@@ -40,13 +40,15 @@ export default function HomeScreen() {
         layout={Layout}
       >
         <ThemedView style={styles.titleContainer}>
-          <Animated.Text 
+          <Animated.View 
             entering={SlideInRight.duration(600).delay(400)}
-            style={[styles.welcomeText, { color: textColor }]}
+            style={styles.logoContainer}
           >
-            Welcome!
-          </Animated.Text>
-          <HelloWave />
+            <Animated.Text style={styles.logoText}>
+              <Animated.Text style={[styles.logoMRKT, { color: tint }]}>MRKT</Animated.Text>
+              <Animated.Text style={[styles.logoNews, { color: textColor }]}>News</Animated.Text>
+            </Animated.Text>
+          </Animated.View>
         </ThemedView>
       </Animated.View>
       
@@ -95,16 +97,35 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  headerImage: {
+    height: '140%',
+    width: '100%',
     position: 'absolute',
+    left: '0%',
+    right: '0%',
+    top: '5%',
   },
   welcomeText: {
     fontSize: 28,
     fontWeight: 'bold',
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoText: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  logoMRKT: {
+    fontSize: 38,
+    fontWeight: '900',
+    letterSpacing: -1,
+  },
+  logoNews: {
+    fontSize: 38,
+    fontWeight: '300',
+    letterSpacing: 0.5,
   },
   descriptionContainer: {
     padding: 12,
